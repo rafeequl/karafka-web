@@ -247,6 +247,11 @@ module Karafka
           # Loads our ps results into memory so we can extract from them whatever we need
           def memory_threads_ps
             @memory_threads_ps = case RUBY_PLATFORM
+                                 when /darwin/
+                                   @shell
+                                 .call('ps -A -o rss=,pid')
+                                 .split("\n")
+                                 .map { |row| row.strip.split(' ').map(&:to_i) }
                                  when /darwin|bsd|linux/
                                    @shell
                                  .call('ps -A -o rss=,thcount,pid')
